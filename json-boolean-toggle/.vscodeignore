@@ -3,6 +3,7 @@
 src/**
 out/**
 node_modules/**
+experimental/**
 .gitignore
 .prettierignore
 .prettierrc.json

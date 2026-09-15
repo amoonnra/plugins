@@ -81,6 +81,12 @@ Reload Visual Studio Code after installation.
 - Users can hide all inlay hints with the global `editor.inlayHints.enabled` setting.
 - The extension changes the document but does not save it automatically.
 
+## Experimental Single-Click DOM Toggle
+
+The source repository contains an unsupported Windows-only renderer patch in `experimental/dom-hack`. It converts a normal left click on this extension's hints into the native double-click edit and applies pill-style colors.
+
+The patch is intentionally excluded from the Marketplace VSIX because it modifies the installed Visual Studio Code workbench, may trigger an installation integrity warning, and is removed by Visual Studio Code updates. See `experimental/dom-hack/README.md` before using it.
+
 ## License
 
 MIT

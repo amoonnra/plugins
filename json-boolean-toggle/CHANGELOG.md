@@ -2,6 +2,10 @@
 
 All notable changes to JSON Boolean Toggle are documented in this file.
 
+## Unreleased
+
+- Added a source-only, reversible Windows DOM hack for pill styling and normal single-click toggling.
+
 ## 0.1.2
 
 - Moved each hint after the following comma when present.

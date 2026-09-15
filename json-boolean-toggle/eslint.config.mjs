@@ -50,4 +50,50 @@ export default tseslint.config(
       'jsdoc/require-returns-description': 'error',
     },
   },
+  {
+    ...tseslint.configs.disableTypeChecked,
+    files: ['experimental/**/*.js'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        Element: 'readonly',
+        EventTarget: 'readonly',
+        HTMLElement: 'readonly',
+        Map: 'readonly',
+        MouseEvent: 'readonly',
+        MutationObserver: 'readonly',
+        ParentNode: 'readonly',
+        window: 'readonly',
+      },
+    },
+    plugins: {
+      jsdoc,
+    },
+    settings: {
+      jsdoc: {
+        mode: 'typescript',
+      },
+    },
+    rules: {
+      ...tseslint.configs.disableTypeChecked.rules,
+      'jsdoc/check-param-names': 'error',
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: {
+            ArrowFunctionExpression: false,
+            ClassDeclaration: true,
+            ClassExpression: true,
+            FunctionDeclaration: true,
+            FunctionExpression: false,
+            MethodDefinition: true,
+          },
+        },
+      ],
+      'jsdoc/require-param': 'error',
+      'jsdoc/require-param-description': 'error',
+      'jsdoc/require-returns': 'error',
+      'jsdoc/require-returns-description': 'error',
+    },
+  },
 );
