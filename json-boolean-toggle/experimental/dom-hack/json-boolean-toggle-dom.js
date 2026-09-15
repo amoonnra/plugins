@@ -283,17 +283,22 @@
       .${TOGGLE_CLASS} {
         display: inline-flex !important;
         align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
         min-width: 54px !important;
+        height: 18px !important;
         margin: 0 2px !important;
-        padding: 1px 8px 1px 5px !important;
+        padding: 0 6px !important;
         border: 1px solid color-mix(in srgb, var(--json-toggle-accent) 78%, white) !important;
         border-radius: 999px !important;
         background: color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
         color: color-mix(in srgb, var(--json-toggle-accent) 55%, white) !important;
         box-shadow: 0 0 0 1px color-mix(in srgb, var(--json-toggle-accent) 18%, transparent),
-          0 2px 8px color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
+          0 1px 5px color-mix(in srgb, var(--json-toggle-accent) 22%, transparent) !important;
         font-weight: 700 !important;
+        line-height: 16px !important;
         letter-spacing: 0.02em !important;
+        vertical-align: middle !important;
         cursor: pointer !important;
         pointer-events: auto !important;
         -webkit-user-select: none !important;
@@ -312,7 +317,6 @@
 
       .${TOGGLE_CLASS}:hover {
         filter: brightness(1.2) saturate(1.15) !important;
-        transform: translateY(-1px) scale(1.03) !important;
       }
 
       .${TOGGLE_CLASS}.${PRESSED_CLASS} {

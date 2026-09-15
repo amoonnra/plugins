@@ -8,7 +8,7 @@ The extension still creates native `InlayHint.textEdits`. The renderer bridge id
 
 It does not parse or edit JSON in the renderer. Visual Studio Code remains responsible for applying the extension-provided text edit.
 
-Clicks anywhere on the pill are normalized to the rendered `ON` or `OFF` text bounds so clicking the emoji circle uses the same reliable Monaco hit target as clicking the label.
+Clicks anywhere on the balanced 18-pixel-high pill are normalized to the rendered `ON` or `OFF` text bounds, so clicking the emoji circle uses the same reliable Monaco hit target as clicking the label.
 
 ## Install
 
