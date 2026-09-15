@@ -5,6 +5,7 @@ All notable changes to JSON Boolean Toggle are documented in this file.
 ## Unreleased
 
 - Made the experimental controls narrower, removed vertical overlap, hid the native hover widget, and applied edits on pointer press for consistent toggling.
+- Rebalanced the experimental pill width and replaced the oversized emoji rendering with a smaller CSS state dot.
 
 ## 0.1.3
 
