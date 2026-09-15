@@ -3,11 +3,15 @@
 
   const STYLE_ID = 'json-boolean-toggle-dom-style';
   const TOGGLE_CLASS = 'json-boolean-dom-toggle';
+  const PRESSED_CLASS = 'json-boolean-dom-toggle-pressed';
   const STATE_ATTRIBUTE = 'data-json-boolean-toggle-state';
   const STATE_BY_LABEL = new Map([
     ['🟢 ON', 'on'],
     ['🔴 OFF', 'off'],
   ]);
+
+  /** @type {{ pointerId: number, toggle: HTMLElement } | undefined} */
+  let activePress;
 
   /**
    * Normalizes non-breaking spaces inserted by the Monaco inlay hint renderer.
@@ -73,13 +77,24 @@
   }
 
   /**
-   * Converts one trusted left-button release into Monaco's native double-click gesture.
+   * Stops a native event before Monaco can move the caret or select editor text.
    *
-   * @param {MouseEvent} event - Captured renderer mouse event.
+   * @param {Event} event - Captured renderer event.
    * @returns {void}
    */
-  function handleMouseUp(event) {
-    if (!event.isTrusted || event.button !== 0 || event.detail !== 1) {
+  function stopNativeEvent(event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+
+  /**
+   * Starts a component press without allowing Monaco to move the caret.
+   *
+   * @param {PointerEvent} event - Captured pointer event.
+   * @returns {void}
+   */
+  function handlePointerDown(event) {
+    if (!event.isTrusted || event.button !== 0 || !event.isPrimary) {
       return;
     }
 
@@ -89,19 +104,108 @@
       return;
     }
 
-    event.preventDefault();
-    event.stopImmediatePropagation();
+    activePress?.toggle.classList.remove(PRESSED_CLASS);
+    activePress = { pointerId: event.pointerId, toggle };
+    toggle.classList.add(PRESSED_CLASS);
+    stopNativeEvent(event);
+  }
 
+  /**
+   * Dispatches the native inlay-hint edit gesture for one completed component press.
+   *
+   * @param {HTMLElement} toggle - Pressed toggle element.
+   * @param {PointerEvent} event - Pointer release used for event coordinates.
+   * @returns {void}
+   */
+  function dispatchToggleEdit(toggle, event) {
     toggle.dispatchEvent(
       new MouseEvent('mouseup', {
         bubbles: true,
+        button: 0,
+        buttons: 0,
         cancelable: true,
         clientX: event.clientX,
         clientY: event.clientY,
         detail: 2,
+        screenX: event.screenX,
+        screenY: event.screenY,
         view: window,
       }),
     );
+  }
+
+  /**
+   * Completes a component press and performs exactly one boolean edit.
+   *
+   * @param {PointerEvent} event - Captured pointer event.
+   * @returns {void}
+   */
+  function handlePointerUp(event) {
+    if (!event.isTrusted || event.button !== 0 || !event.isPrimary) {
+      return;
+    }
+
+    const press = activePress;
+
+    if (press === undefined || press.pointerId !== event.pointerId) {
+      return;
+    }
+
+    activePress = undefined;
+    press.toggle.classList.remove(PRESSED_CLASS);
+    const releasedToggle = findToggle(event.target);
+
+    if (releasedToggle !== press.toggle) {
+      return;
+    }
+
+    stopNativeEvent(event);
+    dispatchToggleEdit(press.toggle, event);
+  }
+
+  /**
+   * Cancels the current component press.
+   *
+   * @param {PointerEvent} event - Captured pointer cancellation event.
+   * @returns {void}
+   */
+  function handlePointerCancel(event) {
+    if (activePress?.pointerId !== event.pointerId) {
+      return;
+    }
+
+    activePress.toggle.classList.remove(PRESSED_CLASS);
+    activePress = undefined;
+  }
+
+  /**
+   * Blocks trusted compatibility mouse events generated after a pointer press.
+   *
+   * Synthetic events remain available to Visual Studio Code's inlay hint handler.
+   *
+   * @param {MouseEvent} event - Captured mouse event.
+   * @returns {void}
+   */
+  function blockNativeMouseEvent(event) {
+    if (!event.isTrusted || findToggle(event.target) === undefined) {
+      return;
+    }
+
+    stopNativeEvent(event);
+  }
+
+  /**
+   * Prevents selection from starting inside a decorated toggle.
+   *
+   * @param {Event} event - Captured selection event.
+   * @returns {void}
+   */
+  function blockToggleSelection(event) {
+    if (findToggle(event.target) === undefined) {
+      return;
+    }
+
+    stopNativeEvent(event);
   }
 
   /** Adds the unsupported renderer styles once per workbench window. */
@@ -128,7 +232,9 @@
         font-weight: 700 !important;
         letter-spacing: 0.02em !important;
         cursor: pointer !important;
+        -webkit-user-select: none !important;
         user-select: none !important;
+        touch-action: none !important;
         transition: filter 120ms ease, transform 120ms ease, box-shadow 120ms ease !important;
       }
 
@@ -145,7 +251,7 @@
         transform: translateY(-1px) scale(1.03) !important;
       }
 
-      .${TOGGLE_CLASS}:active {
+      .${TOGGLE_CLASS}.${PRESSED_CLASS} {
         filter: brightness(0.95) !important;
         transform: translateY(0) scale(0.98) !important;
       }
@@ -169,7 +275,15 @@
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
-    document.addEventListener('mouseup', handleMouseUp, true);
+    document.addEventListener('pointerdown', handlePointerDown, true);
+    document.addEventListener('pointerup', handlePointerUp, true);
+    document.addEventListener('pointercancel', handlePointerCancel, true);
+    document.addEventListener('mousedown', blockNativeMouseEvent, true);
+    document.addEventListener('mouseup', blockNativeMouseEvent, true);
+    document.addEventListener('click', blockNativeMouseEvent, true);
+    document.addEventListener('dblclick', blockNativeMouseEvent, true);
+    document.addEventListener('selectstart', blockToggleSelection, true);
+    document.addEventListener('dragstart', blockToggleSelection, true);
   }
 
   if (document.readyState === 'loading') {
