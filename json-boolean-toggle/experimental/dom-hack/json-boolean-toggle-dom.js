@@ -10,7 +10,18 @@
     ['🔴 OFF', 'off'],
   ]);
 
-  /** @type {{ pointerId: number, toggle: HTMLElement } | undefined} */
+  /**
+   * @typedef {object} ActivePress
+   * @property {number} pointerId - Pointer that started the press.
+   * @property {HTMLElement} toggle - Original rendered toggle element.
+   * @property {string} state - Boolean state rendered at press time.
+   * @property {number} left - Original left edge in viewport coordinates.
+   * @property {number} top - Original top edge in viewport coordinates.
+   * @property {number} right - Original right edge in viewport coordinates.
+   * @property {number} bottom - Original bottom edge in viewport coordinates.
+   */
+
+  /** @type {ActivePress | undefined} */
   let activePress;
 
   /**
@@ -42,7 +53,7 @@
 
     element.classList.add(TOGGLE_CLASS);
     element.setAttribute(STATE_ATTRIBUTE, state);
-    element.title = 'Click to toggle this JSON boolean';
+    element.removeAttribute('title');
   }
 
   /**
@@ -104,10 +115,45 @@
       return;
     }
 
+    const bounds = toggle.getBoundingClientRect();
     activePress?.toggle.classList.remove(PRESSED_CLASS);
-    activePress = { pointerId: event.pointerId, toggle };
+    activePress = {
+      pointerId: event.pointerId,
+      toggle,
+      state: toggle.getAttribute(STATE_ATTRIBUTE) ?? '',
+      left: bounds.left,
+      top: bounds.top,
+      right: bounds.right,
+      bottom: bounds.bottom,
+    };
     toggle.classList.add(PRESSED_CLASS);
     stopNativeEvent(event);
+  }
+
+  /**
+   * Checks whether a re-rendered toggle occupies the original pressed control.
+   *
+   * @param {ActivePress} press - Stored pointer press.
+   * @param {HTMLElement} toggle - Toggle found under the pointer release.
+   * @returns {boolean} Whether the release belongs to the pressed control.
+   */
+  function isMatchingToggle(press, toggle) {
+    if (toggle === press.toggle) {
+      return true;
+    }
+
+    if (toggle.getAttribute(STATE_ATTRIBUTE) !== press.state) {
+      return false;
+    }
+
+    const bounds = toggle.getBoundingClientRect();
+    const tolerance = 2;
+    return (
+      Math.abs(bounds.left - press.left) <= tolerance &&
+      Math.abs(bounds.top - press.top) <= tolerance &&
+      Math.abs(bounds.right - press.right) <= tolerance &&
+      Math.abs(bounds.bottom - press.bottom) <= tolerance
+    );
   }
 
   /**
@@ -155,12 +201,12 @@
     press.toggle.classList.remove(PRESSED_CLASS);
     const releasedToggle = findToggle(event.target);
 
-    if (releasedToggle !== press.toggle) {
+    if (releasedToggle === undefined || !isMatchingToggle(press, releasedToggle)) {
       return;
     }
 
     stopNativeEvent(event);
-    dispatchToggleEdit(press.toggle, event);
+    dispatchToggleEdit(releasedToggle, event);
   }
 
   /**
@@ -192,6 +238,20 @@
     }
 
     stopNativeEvent(event);
+  }
+
+  /**
+   * Blocks hover processing that would resolve hints and replace their DOM nodes.
+   *
+   * @param {Event} event - Captured pointer or mouse hover event.
+   * @returns {void}
+   */
+  function blockToggleHover(event) {
+    if (findToggle(event.target) === undefined) {
+      return;
+    }
+
+    event.stopImmediatePropagation();
   }
 
   /**
@@ -232,6 +292,7 @@
         font-weight: 700 !important;
         letter-spacing: 0.02em !important;
         cursor: pointer !important;
+        pointer-events: auto !important;
         -webkit-user-select: none !important;
         user-select: none !important;
         touch-action: none !important;
@@ -278,8 +339,12 @@
     document.addEventListener('pointerdown', handlePointerDown, true);
     document.addEventListener('pointerup', handlePointerUp, true);
     document.addEventListener('pointercancel', handlePointerCancel, true);
+    document.addEventListener('pointerover', blockToggleHover, true);
+    document.addEventListener('pointermove', blockToggleHover, true);
     document.addEventListener('mousedown', blockNativeMouseEvent, true);
     document.addEventListener('mouseup', blockNativeMouseEvent, true);
+    document.addEventListener('mouseover', blockToggleHover, true);
+    document.addEventListener('mousemove', blockToggleHover, true);
     document.addEventListener('click', blockNativeMouseEvent, true);
     document.addEventListener('dblclick', blockNativeMouseEvent, true);
     document.addEventListener('selectstart', blockToggleSelection, true);

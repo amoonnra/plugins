@@ -2,7 +2,7 @@
   "name": "json-boolean-toggle",
   "displayName": "JSON Boolean Toggle",
   "description": "Toggle JSON boolean values directly from clickable inlay hints.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "your-publisher-id",
   "license": "MIT",
   "icon": "images/icon.png",

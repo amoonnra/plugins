@@ -4,8 +4,11 @@ All notable changes to JSON Boolean Toggle are documented in this file.
 
 ## Unreleased
 
+## 0.1.3
+
 - Added a source-only, reversible Windows DOM hack for pill styling and normal single-click toggling.
 - Made the experimental toggle consume pointer and selection events so every single click toggles once without moving the editor caret.
+- Prevented hover-time inlay hint replacement and removed the toggle tooltip.
 
 ## 0.1.2
 

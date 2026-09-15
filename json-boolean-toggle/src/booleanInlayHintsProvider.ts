@@ -139,7 +139,6 @@ export class BooleanInlayHintsProvider implements vscode.InlayHintsProvider, vsc
     const hint = new vscode.InlayHint(position, value ? '🟢 ON' : '🔴 OFF');
     hint.paddingLeft = true;
     hint.paddingRight = true;
-    hint.tooltip = `Double-click to change this value to ${String(targetValue)}.`;
     hint.textEdits = [vscode.TextEdit.replace(range, String(targetValue))];
     return hint;
   }

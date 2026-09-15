@@ -69,7 +69,7 @@ For a manual smoke test, press `F5`, open a JSON or JSONC file in the Extension 
 
 ```bash
 npm run package
-code --install-extension json-boolean-toggle-0.1.2.vsix
+code --install-extension json-boolean-toggle-0.1.3.vsix
 ```
 
 Reload Visual Studio Code after installation.
