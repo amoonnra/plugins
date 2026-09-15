@@ -4,7 +4,7 @@ This unsupported Windows-only patch changes the Visual Studio Code renderer so J
 
 ## How It Works
 
-The extension still creates native `InlayHint.textEdits`. The renderer bridge identifies only `🟢 ON` and `🔴 OFF` inlay hint spans, adds component styling, blocks editor caret, selection, and hover handling inside the control, and converts every completed primary pointer press into exactly one Visual Studio Code inlay-hint edit gesture.
+The extension still creates native `InlayHint.textEdits`. The renderer bridge identifies only `🟢 ON` and `🔴 OFF` inlay hint spans, adds compact component styling, blocks editor caret, selection, and hover handling inside the control, and converts every primary pointer press into exactly one Visual Studio Code inlay-hint edit gesture.
 
 It does not parse or edit JSON in the renderer. Visual Studio Code remains responsible for applying the extension-provided text edit.
 
@@ -32,7 +32,7 @@ Close every Visual Studio Code window and start it again.
 - A Visual Studio Code update replaces the patched files. Run the installer again after an update.
 - The DOM structure is private and can change without notice.
 - Pointer interaction is intentionally captured inside the decorated control, so clicking it does not reposition the editor caret.
-- Hover events are intentionally captured inside the control, so Visual Studio Code does not show its inlay-hint tooltip or replace the control between pointer press and release.
+- Hover events are intentionally captured inside the control, and the related hover widget is hidden so Visual Studio Code does not show its inlay-hint tooltip.
 - The patch is not suitable for the Visual Studio Marketplace and is excluded from the VSIX.
 - The installer targets the current per-user Windows installation reported by `code --version`.
 - If Visual Studio Code changes the inlay hint gesture or renderer markup, single-click conversion may stop working.

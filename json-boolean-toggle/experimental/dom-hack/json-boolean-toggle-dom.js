@@ -4,25 +4,15 @@
   const STYLE_ID = 'json-boolean-toggle-dom-style';
   const TOGGLE_CLASS = 'json-boolean-dom-toggle';
   const PRESSED_CLASS = 'json-boolean-dom-toggle-pressed';
+  const HOVERING_BODY_CLASS = 'json-boolean-dom-toggle-hovering';
   const STATE_ATTRIBUTE = 'data-json-boolean-toggle-state';
   const STATE_BY_LABEL = new Map([
     ['🟢 ON', 'on'],
     ['🔴 OFF', 'off'],
   ]);
 
-  /**
-   * @typedef {object} ActivePress
-   * @property {number} pointerId - Pointer that started the press.
-   * @property {HTMLElement} toggle - Original rendered toggle element.
-   * @property {string} state - Boolean state rendered at press time.
-   * @property {number} left - Original left edge in viewport coordinates.
-   * @property {number} top - Original top edge in viewport coordinates.
-   * @property {number} right - Original right edge in viewport coordinates.
-   * @property {number} bottom - Original bottom edge in viewport coordinates.
-   */
-
-  /** @type {ActivePress | undefined} */
-  let activePress;
+  /** Pointer identifiers whose initial press was consumed by a toggle. */
+  const activePointerIds = new Set();
 
   /**
    * Normalizes non-breaking spaces inserted by the Monaco inlay hint renderer.
@@ -99,7 +89,7 @@
   }
 
   /**
-   * Starts a component press without allowing Monaco to move the caret.
+   * Applies a component edit immediately, before Monaco can replace its DOM node.
    *
    * @param {PointerEvent} event - Captured pointer event.
    * @returns {void}
@@ -115,45 +105,10 @@
       return;
     }
 
-    const bounds = toggle.getBoundingClientRect();
-    activePress?.toggle.classList.remove(PRESSED_CLASS);
-    activePress = {
-      pointerId: event.pointerId,
-      toggle,
-      state: toggle.getAttribute(STATE_ATTRIBUTE) ?? '',
-      left: bounds.left,
-      top: bounds.top,
-      right: bounds.right,
-      bottom: bounds.bottom,
-    };
+    activePointerIds.add(event.pointerId);
     toggle.classList.add(PRESSED_CLASS);
     stopNativeEvent(event);
-  }
-
-  /**
-   * Checks whether a re-rendered toggle occupies the original pressed control.
-   *
-   * @param {ActivePress} press - Stored pointer press.
-   * @param {HTMLElement} toggle - Toggle found under the pointer release.
-   * @returns {boolean} Whether the release belongs to the pressed control.
-   */
-  function isMatchingToggle(press, toggle) {
-    if (toggle === press.toggle) {
-      return true;
-    }
-
-    if (toggle.getAttribute(STATE_ATTRIBUTE) !== press.state) {
-      return false;
-    }
-
-    const bounds = toggle.getBoundingClientRect();
-    const tolerance = 2;
-    return (
-      Math.abs(bounds.left - press.left) <= tolerance &&
-      Math.abs(bounds.top - press.top) <= tolerance &&
-      Math.abs(bounds.right - press.right) <= tolerance &&
-      Math.abs(bounds.bottom - press.bottom) <= tolerance
-    );
+    dispatchToggleEdit(toggle, event);
   }
 
   /**
@@ -181,47 +136,17 @@
   }
 
   /**
-   * Completes a component press and performs exactly one boolean edit.
+   * Consumes the release that belongs to an already handled toggle press.
    *
    * @param {PointerEvent} event - Captured pointer event.
    * @returns {void}
    */
-  function handlePointerUp(event) {
-    if (!event.isTrusted || event.button !== 0 || !event.isPrimary) {
-      return;
-    }
-
-    const press = activePress;
-
-    if (press === undefined || press.pointerId !== event.pointerId) {
-      return;
-    }
-
-    activePress = undefined;
-    press.toggle.classList.remove(PRESSED_CLASS);
-    const releasedToggle = findToggle(event.target);
-
-    if (releasedToggle === undefined || !isMatchingToggle(press, releasedToggle)) {
+  function handlePointerEnd(event) {
+    if (!activePointerIds.delete(event.pointerId)) {
       return;
     }
 
     stopNativeEvent(event);
-    dispatchToggleEdit(releasedToggle, event);
-  }
-
-  /**
-   * Cancels the current component press.
-   *
-   * @param {PointerEvent} event - Captured pointer cancellation event.
-   * @returns {void}
-   */
-  function handlePointerCancel(event) {
-    if (activePress?.pointerId !== event.pointerId) {
-      return;
-    }
-
-    activePress.toggle.classList.remove(PRESSED_CLASS);
-    activePress = undefined;
   }
 
   /**
@@ -255,6 +180,36 @@
   }
 
   /**
+   * Hides the Visual Studio Code hover widget while a toggle is hovered.
+   *
+   * @param {PointerEvent} event - Captured pointer entry event.
+   * @returns {void}
+   */
+  function handleTogglePointerOver(event) {
+    if (findToggle(event.target) === undefined) {
+      return;
+    }
+
+    document.body.classList.add(HOVERING_BODY_CLASS);
+    event.stopImmediatePropagation();
+  }
+
+  /**
+   * Restores regular hover widgets after the pointer leaves a toggle.
+   *
+   * @param {PointerEvent} event - Captured pointer exit event.
+   * @returns {void}
+   */
+  function handleTogglePointerOut(event) {
+    if (findToggle(event.target) === undefined || findToggle(event.relatedTarget) !== undefined) {
+      return;
+    }
+
+    document.body.classList.remove(HOVERING_BODY_CLASS);
+    event.stopImmediatePropagation();
+  }
+
+  /**
    * Prevents selection from starting inside a decorated toggle.
    *
    * @param {Event} event - Captured selection event.
@@ -280,17 +235,18 @@
       .${TOGGLE_CLASS} {
         display: inline-flex !important;
         align-items: center !important;
-        min-width: 54px !important;
-        margin: 0 2px !important;
-        padding: 1px 8px 1px 5px !important;
+        box-sizing: border-box !important;
+        min-width: 44px !important;
+        max-height: calc(1em + 4px) !important;
+        margin: 0 1px !important;
+        padding: 0 5px 0 3px !important;
         border: 1px solid color-mix(in srgb, var(--json-toggle-accent) 78%, white) !important;
         border-radius: 999px !important;
         background: color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
         color: color-mix(in srgb, var(--json-toggle-accent) 55%, white) !important;
-        box-shadow: 0 0 0 1px color-mix(in srgb, var(--json-toggle-accent) 18%, transparent),
-          0 2px 8px color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
+        box-shadow: 0 0 4px color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
         font-weight: 700 !important;
-        letter-spacing: 0.02em !important;
+        line-height: 1 !important;
         cursor: pointer !important;
         pointer-events: auto !important;
         -webkit-user-select: none !important;
@@ -309,12 +265,15 @@
 
       .${TOGGLE_CLASS}:hover {
         filter: brightness(1.2) saturate(1.15) !important;
-        transform: translateY(-1px) scale(1.03) !important;
       }
 
       .${TOGGLE_CLASS}.${PRESSED_CLASS} {
         filter: brightness(0.95) !important;
         transform: translateY(0) scale(0.98) !important;
+      }
+
+      body.${HOVERING_BODY_CLASS} .monaco-hover {
+        display: none !important;
       }
     `;
     document.head.appendChild(style);
@@ -337,9 +296,10 @@
 
     observer.observe(document.body, { childList: true, subtree: true });
     document.addEventListener('pointerdown', handlePointerDown, true);
-    document.addEventListener('pointerup', handlePointerUp, true);
-    document.addEventListener('pointercancel', handlePointerCancel, true);
-    document.addEventListener('pointerover', blockToggleHover, true);
+    document.addEventListener('pointerup', handlePointerEnd, true);
+    document.addEventListener('pointercancel', handlePointerEnd, true);
+    document.addEventListener('pointerover', handleTogglePointerOver, true);
+    document.addEventListener('pointerout', handleTogglePointerOut, true);
     document.addEventListener('pointermove', blockToggleHover, true);
     document.addEventListener('mousedown', blockNativeMouseEvent, true);
     document.addEventListener('mouseup', blockNativeMouseEvent, true);

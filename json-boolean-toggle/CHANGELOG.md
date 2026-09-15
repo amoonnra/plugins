@@ -4,6 +4,8 @@ All notable changes to JSON Boolean Toggle are documented in this file.
 
 ## Unreleased
 
+- Made the experimental controls narrower, removed vertical overlap, hid the native hover widget, and applied edits on pointer press for consistent toggling.
+
 ## 0.1.3
 
 - Added a source-only, reversible Windows DOM hack for pill styling and normal single-click toggling.
