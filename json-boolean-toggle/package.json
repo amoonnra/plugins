@@ -3,7 +3,17 @@
   "displayName": "JSON Boolean Toggle",
   "description": "Toggle JSON boolean values from framed native inlay hints.",
   "version": "0.2.0",
-  "publisher": "your-publisher-id",
+  "publisher": "ivandvoeglazov",
+  "author": "amoonnra",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amoonnra/plugins.git",
+    "directory": "json-boolean-toggle"
+  },
+  "homepage": "https://github.com/amoonnra/plugins/tree/main/json-boolean-toggle",
+  "bugs": {
+    "url": "https://github.com/amoonnra/plugins/issues"
+  },
   "license": "MIT",
   "icon": "images/icon.png",
   "galleryBanner": {
