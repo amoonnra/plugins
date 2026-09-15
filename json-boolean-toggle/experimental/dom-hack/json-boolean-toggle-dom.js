@@ -112,6 +112,52 @@
   }
 
   /**
+   * Resolves a reliable edit point over the ON or OFF text instead of the emoji.
+   *
+   * @param {HTMLElement} toggle - Rendered toggle element.
+   * @param {PointerEvent} event - Original pointer event used as a fallback.
+   * @returns {{ clientX: number, clientY: number, screenX: number, screenY: number }} Reliable event coordinates.
+   */
+  function getEditPoint(toggle, event) {
+    const rawText = toggle.textContent ?? '';
+    const stateLabel = toggle.getAttribute(STATE_ATTRIBUTE) === 'on' ? 'ON' : 'OFF';
+    const labelOffset = rawText.lastIndexOf(stateLabel);
+    const textNode = toggle.firstChild;
+
+    if (textNode === null || textNode.nodeType !== window.Node.TEXT_NODE || labelOffset < 0) {
+      return {
+        clientX: event.clientX,
+        clientY: event.clientY,
+        screenX: event.screenX,
+        screenY: event.screenY,
+      };
+    }
+
+    const labelRange = document.createRange();
+    labelRange.setStart(textNode, labelOffset);
+    labelRange.setEnd(textNode, labelOffset + stateLabel.length);
+    const bounds = labelRange.getBoundingClientRect();
+
+    if (bounds.width === 0 || bounds.height === 0) {
+      return {
+        clientX: event.clientX,
+        clientY: event.clientY,
+        screenX: event.screenX,
+        screenY: event.screenY,
+      };
+    }
+
+    const clientX = bounds.left + bounds.width / 2;
+    const clientY = bounds.top + bounds.height / 2;
+    return {
+      clientX,
+      clientY,
+      screenX: event.screenX + clientX - event.clientX,
+      screenY: event.screenY + clientY - event.clientY,
+    };
+  }
+
+  /**
    * Dispatches the native inlay-hint edit gesture for one completed component press.
    *
    * @param {HTMLElement} toggle - Pressed toggle element.
@@ -119,17 +165,19 @@
    * @returns {void}
    */
   function dispatchToggleEdit(toggle, event) {
+    const point = getEditPoint(toggle, event);
+
     toggle.dispatchEvent(
       new MouseEvent('mouseup', {
         bubbles: true,
         button: 0,
         buttons: 0,
         cancelable: true,
-        clientX: event.clientX,
-        clientY: event.clientY,
+        clientX: point.clientX,
+        clientY: point.clientY,
         detail: 2,
-        screenX: event.screenX,
-        screenY: event.screenY,
+        screenX: point.screenX,
+        screenY: point.screenY,
         view: window,
       }),
     );
@@ -235,18 +283,17 @@
       .${TOGGLE_CLASS} {
         display: inline-flex !important;
         align-items: center !important;
-        box-sizing: border-box !important;
-        min-width: 44px !important;
-        max-height: calc(1em + 4px) !important;
-        margin: 0 1px !important;
-        padding: 0 5px 0 3px !important;
+        min-width: 54px !important;
+        margin: 0 2px !important;
+        padding: 1px 8px 1px 5px !important;
         border: 1px solid color-mix(in srgb, var(--json-toggle-accent) 78%, white) !important;
         border-radius: 999px !important;
         background: color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
         color: color-mix(in srgb, var(--json-toggle-accent) 55%, white) !important;
-        box-shadow: 0 0 4px color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--json-toggle-accent) 18%, transparent),
+          0 2px 8px color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
         font-weight: 700 !important;
-        line-height: 1 !important;
+        letter-spacing: 0.02em !important;
         cursor: pointer !important;
         pointer-events: auto !important;
         -webkit-user-select: none !important;
@@ -265,6 +312,7 @@
 
       .${TOGGLE_CLASS}:hover {
         filter: brightness(1.2) saturate(1.15) !important;
+        transform: translateY(-1px) scale(1.03) !important;
       }
 
       .${TOGGLE_CLASS}.${PRESSED_CLASS} {

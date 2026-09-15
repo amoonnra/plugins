@@ -4,9 +4,11 @@ This unsupported Windows-only patch changes the Visual Studio Code renderer so J
 
 ## How It Works
 
-The extension still creates native `InlayHint.textEdits`. The renderer bridge identifies only `🟢 ON` and `🔴 OFF` inlay hint spans, adds compact component styling, blocks editor caret, selection, and hover handling inside the control, and converts every primary pointer press into exactly one Visual Studio Code inlay-hint edit gesture.
+The extension still creates native `InlayHint.textEdits`. The renderer bridge identifies only `🟢 ON` and `🔴 OFF` inlay hint spans, adds pill component styling, blocks editor caret, selection, and hover handling inside the control, and converts every primary pointer press into exactly one Visual Studio Code inlay-hint edit gesture.
 
 It does not parse or edit JSON in the renderer. Visual Studio Code remains responsible for applying the extension-provided text edit.
+
+Clicks anywhere on the pill are normalized to the rendered `ON` or `OFF` text bounds so clicking the emoji circle uses the same reliable Monaco hit target as clicking the label.
 
 ## Install
 
