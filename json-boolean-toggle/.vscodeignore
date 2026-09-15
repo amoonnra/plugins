@@ -1,0 +1,14 @@
+.github/**
+.vscode/**
+src/**
+out/**
+node_modules/**
+.gitignore
+.prettierignore
+.prettierrc.json
+eslint.config.mjs
+tsconfig.json
+tsconfig.test.json
+PUBLISHING.md
+*.vsix
+*.log
