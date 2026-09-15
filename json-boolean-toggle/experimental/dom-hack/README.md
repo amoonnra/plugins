@@ -8,6 +8,8 @@ The extension still creates native `InlayHint.textEdits`. The renderer bridge id
 
 It does not parse or edit JSON in the renderer. Visual Studio Code remains responsible for applying the extension-provided text edit.
 
+The bridge normalizes edit events to the center of the underlying inlay hint so the entire styled pill remains a reliable hit target even when it is wider than Monaco's original text metrics.
+
 ## Install
 
 Run from the extension source directory:

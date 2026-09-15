@@ -115,21 +115,25 @@
    * Dispatches the native inlay-hint edit gesture for one completed component press.
    *
    * @param {HTMLElement} toggle - Pressed toggle element.
-   * @param {PointerEvent} event - Pointer release used for event coordinates.
+   * @param {PointerEvent} event - Pointer press used to preserve screen coordinates.
    * @returns {void}
    */
   function dispatchToggleEdit(toggle, event) {
+    const bounds = toggle.getBoundingClientRect();
+    const clientX = bounds.left + bounds.width / 2;
+    const clientY = bounds.top + bounds.height / 2;
+
     toggle.dispatchEvent(
       new MouseEvent('mouseup', {
         bubbles: true,
         button: 0,
         buttons: 0,
         cancelable: true,
-        clientX: event.clientX,
-        clientY: event.clientY,
+        clientX,
+        clientY,
         detail: 2,
-        screenX: event.screenX,
-        screenY: event.screenY,
+        screenX: event.screenX + clientX - event.clientX,
+        screenY: event.screenY + clientY - event.clientY,
         view: window,
       }),
     );
