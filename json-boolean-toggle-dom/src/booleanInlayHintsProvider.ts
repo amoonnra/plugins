@@ -12,7 +12,7 @@ interface TokenCacheEntry {
   readonly tokens: readonly BooleanToken[];
 }
 
-/** Provides clickable ON/OFF hints for JSON boolean literals. */
+/** Provides DOM-decorated ON/OFF hints for JSON boolean literals. */
 export class BooleanInlayHintsProvider implements vscode.InlayHintsProvider, vscode.Disposable {
   /** Emits invalidation notifications consumed by the VS Code editor. */
   private readonly changeEmitter = new vscode.EventEmitter<void>();
@@ -44,7 +44,7 @@ export class BooleanInlayHintsProvider implements vscode.InlayHintsProvider, vsc
   }
 
   /**
-   * Produces clickable hints for boolean literals in the requested editor range.
+   * Produces hints for boolean literals in the requested editor range.
    *
    * @param document - JSON or JSONC document being rendered.
    * @param range - Visible range requested by VS Code.
@@ -123,7 +123,7 @@ export class BooleanInlayHintsProvider implements vscode.InlayHintsProvider, vsc
   }
 
   /**
-   * Builds one clickable hint for a boolean literal.
+   * Builds one hint for a boolean literal.
    *
    * @param range - Exact source range occupied by the literal.
    * @param position - Position after the following comma, or after the literal.
@@ -136,7 +136,7 @@ export class BooleanInlayHintsProvider implements vscode.InlayHintsProvider, vsc
     value: boolean,
   ): vscode.InlayHint {
     const targetValue = !value;
-    const hint = new vscode.InlayHint(position, value ? '⟦ 🟢 ON ⟧' : '⟦ 🔴 OFF ⟧');
+    const hint = new vscode.InlayHint(position, value ? '🟢 ON' : '🔴 OFF');
     hint.paddingLeft = true;
     hint.paddingRight = true;
     hint.textEdits = [vscode.TextEdit.replace(range, String(targetValue))];

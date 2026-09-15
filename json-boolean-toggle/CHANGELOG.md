@@ -4,16 +4,14 @@ All notable changes to JSON Boolean Toggle are documented in this file.
 
 ## Unreleased
 
-- Restored the taller pill frame while keeping immediate pointer-press edits and the hidden native hover widget.
-- Normalized emoji-circle clicks to the rendered ON/OFF text bounds for a consistent Monaco hit target.
-- Reduced the pill height with symmetric padding, the editor's native font size, and a balanced shadow without changing its click target.
-- Reduced the experimental pill's left inset while preserving its height, typography, and click behavior.
+## 0.2.0
+
+- Added a balanced Unicode frame to the Marketplace-safe native inlay hints.
+- Removed the extension-provided hover tooltip while retaining native double-click editing.
 
 ## 0.1.3
 
-- Added a source-only, reversible Windows DOM hack for pill styling and normal single-click toggling.
-- Made the experimental toggle consume pointer and selection events so every single click toggles once without moving the editor caret.
-- Prevented hover-time inlay hint replacement and removed the toggle tooltip.
+- Removed the extension-provided hover tooltip.
 
 ## 0.1.2
 

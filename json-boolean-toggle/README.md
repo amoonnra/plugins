@@ -12,15 +12,15 @@ Toggle JSON boolean values directly from clickable inlay hints while keeping the
 The extension renders a compact control after the following comma when one is present:
 
 ```text
-"enabled": true,  🟢 ON
-"debug": false    🔴 OFF
+"enabled": true,  ⟦ 🟢 ON ⟧
+"debug": false    ⟦ 🔴 OFF ⟧
 ```
 
 Double-clicking the hint replaces only the boolean literal without requiring Ctrl or Cmd, so indentation, comments, trailing commas, and surrounding formatting remain unchanged.
 
 ## Features
 
-- Colorful `🟢 ON` and `🔴 OFF` inlay hints after boolean values and their commas.
+- Framed `⟦ 🟢 ON ⟧` and `⟦ 🔴 OFF ⟧` native inlay hints after boolean values and their commas.
 - Support for JSON and JSON with Comments (`jsonc`).
 - Correct handling of boolean-looking text inside strings and comments.
 - Safe stale-hint detection before an edit is applied.
@@ -69,7 +69,7 @@ For a manual smoke test, press `F5`, open a JSON or JSONC file in the Extension 
 
 ```bash
 npm run package
-code --install-extension json-boolean-toggle-0.1.3.vsix
+code --install-extension json-boolean-toggle-0.2.0.vsix
 ```
 
 Reload Visual Studio Code after installation.
@@ -78,14 +78,9 @@ Reload Visual Studio Code after installation.
 
 - Visual Studio Code controls the final appearance and color of inlay hints. Extensions cannot render arbitrary HTML or CSS inside the standard text editor.
 - The stable Inlay Hint API uses a double-click for edits. A single-click action requires a custom editor or unsupported editor DOM modification.
+- Visual Studio Code may show its built-in double-click instruction on hover when an inlay hint contains text edits. The public API cannot disable that instruction independently.
 - Users can hide all inlay hints with the global `editor.inlayHints.enabled` setting.
 - The extension changes the document but does not save it automatically.
-
-## Experimental Single-Click DOM Toggle
-
-The source repository contains an unsupported Windows-only renderer patch in `experimental/dom-hack`. It converts a normal left click on this extension's hints into the native double-click edit and applies pill-style colors.
-
-The patch is intentionally excluded from the Marketplace VSIX because it modifies the installed Visual Studio Code workbench, may trigger an installation integrity warning, and is removed by Visual Studio Code updates. See `experimental/dom-hack/README.md` before using it.
 
 ## License
 
