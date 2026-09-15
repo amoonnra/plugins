@@ -1,0 +1,39 @@
+name: Node Modules Links
+
+on:
+  push:
+    paths:
+      - "node-modules-links/**"
+      - ".github/workflows/node-modules-links.yml"
+  pull_request:
+    paths:
+      - "node-modules-links/**"
+      - ".github/workflows/node-modules-links.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: node-modules-links
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: node-modules-links/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm run package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: node-modules-links-vsix
+          path: node-modules-links/*.vsix
+          if-no-files-found: error
