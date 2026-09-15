@@ -4,11 +4,9 @@ This unsupported Windows-only patch changes the Visual Studio Code renderer so J
 
 ## How It Works
 
-The extension still creates native `InlayHint.textEdits`. The renderer bridge identifies only `🟢 ON` and `🔴 OFF` inlay hint spans, renders a balanced pill with a smaller state dot, blocks editor caret, selection, and hover handling inside the control, and converts every primary pointer press into exactly one Visual Studio Code inlay-hint edit gesture.
+The extension still creates native `InlayHint.textEdits`. The renderer bridge identifies only `🟢 ON` and `🔴 OFF` inlay hint spans, adds compact component styling, blocks editor caret, selection, and hover handling inside the control, and converts every primary pointer press into exactly one Visual Studio Code inlay-hint edit gesture.
 
 It does not parse or edit JSON in the renderer. Visual Studio Code remains responsible for applying the extension-provided text edit.
-
-The bridge normalizes edit events to the center of the underlying inlay hint so the entire styled pill remains a reliable hit target even when it is wider than Monaco's original text metrics.
 
 ## Install
 

@@ -115,25 +115,21 @@
    * Dispatches the native inlay-hint edit gesture for one completed component press.
    *
    * @param {HTMLElement} toggle - Pressed toggle element.
-   * @param {PointerEvent} event - Pointer press used to preserve screen coordinates.
+   * @param {PointerEvent} event - Pointer release used for event coordinates.
    * @returns {void}
    */
   function dispatchToggleEdit(toggle, event) {
-    const bounds = toggle.getBoundingClientRect();
-    const clientX = bounds.left + bounds.width / 2;
-    const clientY = bounds.top + bounds.height / 2;
-
     toggle.dispatchEvent(
       new MouseEvent('mouseup', {
         bubbles: true,
         button: 0,
         buttons: 0,
         cancelable: true,
-        clientX,
-        clientY,
+        clientX: event.clientX,
+        clientY: event.clientY,
         detail: 2,
-        screenX: event.screenX + clientX - event.clientX,
-        screenY: event.screenY + clientY - event.clientY,
+        screenX: event.screenX,
+        screenY: event.screenY,
         view: window,
       }),
     );
@@ -239,21 +235,18 @@
       .${TOGGLE_CLASS} {
         display: inline-flex !important;
         align-items: center !important;
-        justify-content: center !important;
-        gap: 5px !important;
         box-sizing: border-box !important;
-        min-width: 52px !important;
-        height: 17px !important;
+        min-width: 44px !important;
+        max-height: calc(1em + 4px) !important;
         margin: 0 1px !important;
-        padding: 0 6px !important;
+        padding: 0 5px 0 3px !important;
         border: 1px solid color-mix(in srgb, var(--json-toggle-accent) 78%, white) !important;
         border-radius: 999px !important;
         background: color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
-        color: transparent !important;
+        color: color-mix(in srgb, var(--json-toggle-accent) 55%, white) !important;
         box-shadow: 0 0 4px color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;
-        font-size: 0 !important;
-        line-height: 17px !important;
-        vertical-align: middle !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
         cursor: pointer !important;
         pointer-events: auto !important;
         -webkit-user-select: none !important;
@@ -268,40 +261,6 @@
 
       .${TOGGLE_CLASS}[${STATE_ATTRIBUTE}='off'] {
         --json-toggle-accent: #ef4444;
-      }
-
-      .${TOGGLE_CLASS}::before {
-        content: '' !important;
-        display: block !important;
-        flex: 0 0 8px !important;
-        box-sizing: border-box !important;
-        width: 8px !important;
-        height: 8px !important;
-        border: 1px solid color-mix(in srgb, var(--json-toggle-accent) 72%, white) !important;
-        border-radius: 50% !important;
-        background: radial-gradient(
-          circle at 32% 28%,
-          white 0 8%,
-          color-mix(in srgb, var(--json-toggle-accent) 45%, white) 22%,
-          var(--json-toggle-accent) 72%
-        ) !important;
-        box-shadow: 0 0 3px color-mix(in srgb, var(--json-toggle-accent) 65%, transparent) !important;
-      }
-
-      .${TOGGLE_CLASS}::after {
-        color: color-mix(in srgb, var(--json-toggle-accent) 55%, white) !important;
-        font-family: var(--monaco-monospace-font, monospace) !important;
-        font-size: 11px !important;
-        font-weight: 700 !important;
-        line-height: 1 !important;
-      }
-
-      .${TOGGLE_CLASS}[${STATE_ATTRIBUTE}='on']::after {
-        content: 'ON' !important;
-      }
-
-      .${TOGGLE_CLASS}[${STATE_ATTRIBUTE}='off']::after {
-        content: 'OFF' !important;
       }
 
       .${TOGGLE_CLASS}:hover {
