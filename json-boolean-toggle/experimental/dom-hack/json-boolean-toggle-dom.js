@@ -288,7 +288,7 @@
         min-width: 54px !important;
         height: 18px !important;
         margin: 0 2px !important;
-        padding: 0 6px !important;
+        padding: 0 6px 0 3px !important;
         border: 1px solid color-mix(in srgb, var(--json-toggle-accent) 78%, white) !important;
         border-radius: 999px !important;
         background: color-mix(in srgb, var(--json-toggle-accent) 24%, transparent) !important;

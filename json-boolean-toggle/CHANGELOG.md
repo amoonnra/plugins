@@ -7,6 +7,7 @@ All notable changes to JSON Boolean Toggle are documented in this file.
 - Restored the taller pill frame while keeping immediate pointer-press edits and the hidden native hover widget.
 - Normalized emoji-circle clicks to the rendered ON/OFF text bounds for a consistent Monaco hit target.
 - Reduced the pill height with symmetric padding, the editor's native font size, and a balanced shadow without changing its click target.
+- Reduced the experimental pill's left inset while preserving its height, typography, and click behavior.
 
 ## 0.1.3
 
