@@ -1,6 +1,5 @@
 node_modules/
 dist/
-*.vsix
 *.log
 .vscode-test/
 images/variants/drafts/

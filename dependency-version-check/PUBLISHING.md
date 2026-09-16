@@ -9,7 +9,7 @@ The manifest uses this repository's publisher, `ivandvoeglazov`, and repository,
 3. With Node.js 24 or newer, run `npm ci`, `npm run check`, and `npm run package`.
 4. Inspect `npx vsce ls --no-dependencies`. The VSIX should contain the manifest, bundled extension, icon, README, changelog, support and license notices; it must not contain `node_modules`, source maps, secrets or development files.
 5. Install the generated VSIX in a clean VS Code profile and complete the manual checks below.
-6. Commit and push the reviewed extension directory and `.github/workflows/dependency-version-check.yml` so the public links resolve.
+6. Keep only the latest VSIX in the extension directory, then commit and push it with the reviewed extension files and `.github/workflows/dependency-version-check.yml` so the public links resolve.
 7. Follow the current [official VS Code authentication and publishing guide](https://code.visualstudio.com/api/working-with-extensions/publishing-extension). Publish using `npm run publish` with your configured credentials. For Microsoft Entra ID where configured, use `npm run publish -- --azure-credential`.
 
 Never commit publishing credentials. Local packaging and the CI workflow do not publish to Marketplace. This repository has no automatic public release step.
@@ -18,7 +18,9 @@ Never commit publishing credentials. Local packaging and the CI workflow do not 
 
 ## Download a GitHub Actions build
 
-The [Dependency Version Check workflow](https://github.com/amoonnra/plugins/actions/workflows/dependency-version-check.yml) runs when extension files or its workflow are pushed / changed in a pull request. It installs the locked development dependencies, runs the checks, builds the current version's VSIX and uploads it as **dependency-version-check-vsix**. VSIX files are ignored by Git; the artifact contains the package generated from that run's source revision.
+The latest VSIX is committed alongside the extension source and can be downloaded directly from its GitHub file page with **Download raw file**.
+
+The [Dependency Version Check workflow](https://github.com/amoonnra/plugins/actions/workflows/dependency-version-check.yml) runs when extension files or its workflow are pushed / changed in a pull request. It installs the locked development dependencies, runs the checks, builds the current version's VSIX and uploads it as **dependency-version-check-vsix**. The artifact contains the package generated from that run's source revision.
 
 On GitHub, open **Actions → Dependency Version Check**, select the successful run and download **dependency-version-check-vsix** under **Artifacts**. Extract the ZIP and install its `.vsix` using **Extensions: Install from VSIX...** in VS Code. You must be signed in to GitHub to download the artifact, and it is retained according to the repository's artifact retention settings.
 
