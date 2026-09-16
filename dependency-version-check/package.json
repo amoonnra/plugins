@@ -1,0 +1,168 @@
+{
+  "name": "dependency-version-check",
+  "displayName": "Dependency Version Check",
+  "description": "Warn when package.json dependencies are missing or installed versions do not satisfy their requirements.",
+  "version": "0.1.4",
+  "publisher": "ivandvoeglazov",
+  "author": "amoonnra",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amoonnra/plugins.git",
+    "directory": "dependency-version-check"
+  },
+  "homepage": "https://github.com/amoonnra/plugins/tree/main/dependency-version-check",
+  "bugs": {
+    "url": "https://github.com/amoonnra/plugins/issues"
+  },
+  "license": "MIT",
+  "pricing": "Free",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#081729",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "package.json",
+    "node_modules",
+    "dependencies",
+    "npm",
+    "pnpm",
+    "yarn",
+    "bun",
+    "monorepo",
+    "versions",
+    "warnings"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguage:json",
+    "onLanguage:jsonc"
+  ],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Dependency checks work in Restricted Mode; installation requires workspace trust.",
+      "restrictedConfigurations": [
+        "dependencyVersionCheck.installCommand"
+      ]
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "Requires a physical node_modules directory."
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "dependencyVersionCheck.refresh",
+        "title": "Dependency Version Check: Refresh All Projects"
+      },
+      {
+        "command": "dependencyVersionCheck.install",
+        "title": "Dependency Version Check: Install / Update Active Project Dependencies"
+      },
+      {
+        "command": "dependencyVersionCheck.showProblems",
+        "title": "Dependency Version Check: Show Affected Projects"
+      }
+    ],
+    "configuration": {
+      "title": "Dependency Version Check",
+      "properties": {
+        "dependencyVersionCheck.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check declared dependencies against installed packages."
+        },
+        "dependencyVersionCheck.notifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Notify about the active file's project outside package.json. Closing defers unchanged requirements and problems; dependency changes or Git HEAD changes can notify again."
+        },
+        "dependencyVersionCheck.pollIntervalSeconds": {
+          "type": "number",
+          "default": 15,
+          "minimum": 5,
+          "maximum": 300,
+          "description": "Fallback refresh interval for branch switches and installations missed by file watchers."
+        },
+        "dependencyVersionCheck.exclude": {
+          "type": "string",
+          "default": "**/{node_modules,.git,.yarn,.pnpm-store,dist,build,coverage}/**",
+          "description": "Glob for directories excluded from recursive project discovery."
+        },
+        "dependencyVersionCheck.checkPeerDependencies": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Check peerDependencies; missing optional peers are ignored."
+        },
+        "dependencyVersionCheck.checkOptionalDependencies": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "description": "Also warn about missing optionalDependencies. Installed optional packages are always checked."
+        },
+        "dependencyVersionCheck.packageManager": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "npm",
+            "pnpm",
+            "yarn",
+            "bun"
+          ],
+          "default": "auto",
+          "scope": "resource",
+          "description": "Installation manager. Auto uses packageManager, then the nearest installation-root lockfile, then npm."
+        },
+        "dependencyVersionCheck.installCommand": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Custom shell command run only in the active file's project directory, for example npm run deps:install. Empty uses a project-scoped package manager command."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "bundle": "esbuild src/extension.ts --bundle --platform=node --format=cjs --target=node18 --main-fields=module,main --external:vscode --outfile=dist/extension.js --sourcemap --sources-content=false",
+    "bundle:watch": "npm run bundle -- --watch",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run bundle",
+    "vscode:prepublish": "npm run bundle",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1",
+    "semver": "^7.7.2",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.10.0",
+    "@types/semver": "^7.7.0",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.0.1",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.0"
+  }
+}

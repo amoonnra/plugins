@@ -1,0 +1,15 @@
+.vscode/**
+src/**
+node_modules/**
+.gitignore
+.prettierignore
+.prettierrc.json
+eslint.config.mjs
+tsconfig.json
+package-lock.json
+PUBLISHING.md
+images/ICON-PROMPT.md
+images/icon-source.png
+*.vsix
+*.log
+dist/**/*.map

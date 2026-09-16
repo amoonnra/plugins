@@ -1,0 +1,39 @@
+name: Dependency Version Check
+
+on:
+  push:
+    paths:
+      - "dependency-version-check/**"
+      - ".github/workflows/dependency-version-check.yml"
+  pull_request:
+    paths:
+      - "dependency-version-check/**"
+      - ".github/workflows/dependency-version-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dependency-version-check
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: dependency-version-check/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm run package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dependency-version-check-vsix
+          path: dependency-version-check/*.vsix
+          if-no-files-found: error
